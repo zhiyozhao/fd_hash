@@ -12,6 +12,8 @@ def gen_(root_path):
     if not osp.islink(root_path) and osp.isdir(root_path):
         root_node = {}
         for name in os.listdir(root_path):
+            if name == FDHASH_FILE:
+                continue
             path = osp.join(root_path, name)
             root_node[name] = gen_(path)
 
@@ -38,12 +40,18 @@ def check_(root_path, org, cur):
         org_only = org_names - cur_names
         cur_only = cur_names - org_names
         for name in org_only:
+            if name == FDHASH_FILE:
+                continue
             path = osp.join(root_path, name)
             print(f"d: {path}")
         for name in cur_only:
+            if name == FDHASH_FILE:
+                continue
             path = osp.join(root_path, name)
             print(f"a: {path}")
         for name in insc:
+            if name == FDHASH_FILE:
+                continue
             path = osp.join(root_path, name)
             check_(path, org[name], cur[name])
     elif osp.islink(root_path) or osp.isfile(root_path):
