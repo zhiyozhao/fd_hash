@@ -1,0 +1,1 @@
+Simple utility to track folder content by generating hash descriptions
