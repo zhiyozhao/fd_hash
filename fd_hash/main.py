@@ -8,6 +8,15 @@ FDHASH_FILE = ".fdhash"
 ALGO = "sha1"
 
 
+def read_by_chunk(file_path, chunk_size=4096):
+    with open(file_path, "rb") as f:
+        while True:
+            chunk = f.read(chunk_size)
+            if not chunk:
+                return
+            yield chunk
+
+
 def gen_(root_path):
     if not osp.islink(root_path) and osp.isdir(root_path):
         root_node = {}
@@ -20,14 +29,17 @@ def gen_(root_path):
         return root_node
     elif osp.islink(root_path):
         content = bytes(os.readlink(root_path), encoding="utf-8")
+        res = getattr(hashlib, ALGO)(content).hexdigest()
     elif osp.isfile(root_path):
-        with open(root_path, "rb") as f:
-            content = f.read()
+        hasher = getattr(hashlib, ALGO)()
+        chunks = read_by_chunk(root_path)
+        for chunk in chunks:
+            hasher.update(chunk)
+        res = hasher.hexdigest()
     else:
         assert (
             False
         ), f"{root_path} with special file type (not symlink, file or directory)"
-    res = getattr(hashlib, ALGO)(content).hexdigest()
 
     return res
 
